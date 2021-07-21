@@ -11,7 +11,7 @@ in vec2 TexCoords;
 
 //光源属性结构
 struct Light {
-    vec3 position;      //光源的坐标
+    vec3 direction;     //平行光照射方向
     vec3 ambient;       //环境光
     vec3 diffuse;       //漫反射
     vec3 specular;      //镜面反射
@@ -23,7 +23,6 @@ out vec4 FragColor;
 
 in vec3 FragPos;        //片段的坐标位置
 in vec3 Normal;         //片段的法向量
-in vec3 LightPos;       //光源的坐标
 
 void main()
 {
@@ -31,7 +30,7 @@ void main()
     vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
     //漫反射光
     vec3 norm = normalize(Normal);  //标准化法向量
-    vec3 lightDir = normalize(LightPos - FragPos); //标准化 光与片段位置向量差（光线方向）
+    vec3 lightDir = normalize(-light.direction);
     float diff = max(dot(norm, lightDir), 0.0); //向量点乘 得到cos余弦值
     vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
     //镜面反射光

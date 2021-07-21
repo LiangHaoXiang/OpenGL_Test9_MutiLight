@@ -205,7 +205,7 @@ int main()
                 model = rotate(model, (float)glfwGetTime() * radians(5.0f*i+10.0f), vec3(0.5f, 1.0f, 0.0f));
             }
             else {
-                model = rotate(model, radians(50.0f), vec3(0.5f, 1.0f, 0.0f));
+                model = rotate(model, radians(50.0f), vec3(1.0f, 0.3f, 0.5f));
             }
             
             lightingShader.use();
@@ -215,7 +215,7 @@ int main()
             lightingShader.setInt("material.specular", 1);
             lightingShader.setFloat("material.shininess", shininess);
             //设置光源
-            lightingShader.setVec3("lightPos", lightPos);
+            lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
             lightingShader.setVec3("light.ambient", vec3(0.7f));
             lightingShader.setVec3("light.diffuse", vec3(1.0f)); // 将光照调暗了一些以搭配场景
             lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);

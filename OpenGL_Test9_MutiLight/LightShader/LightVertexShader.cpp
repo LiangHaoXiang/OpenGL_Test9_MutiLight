@@ -7,11 +7,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform vec3 lightPos;
-
 out vec3 FragPos;   //片段的坐标位置
 out vec3 Normal;    //片段的法向量
-out vec3 LightPos;  //光源的坐标
 
 out vec2 TexCoords;
 
@@ -23,6 +20,5 @@ void main()
     //法线矩阵让法向量转换在世界空间坐标中
     //inverse函数：得到逆矩阵。      transpose函数：得到转置矩阵
     Normal = mat3(transpose(inverse(view * model))) * aNormal;
-    LightPos = vec3(view * vec4(lightPos, 1.0));
     TexCoords = aTexCoords;
 }
