@@ -13,12 +13,12 @@ out vec3 Normal;    //片段的法向量
 out vec2 TexCoords;
 
 void main()
-{
-    gl_Position = projection * view * model * vec4(aPos, 1.0);
-    FragPos = vec3(view * model * vec4(aPos, 1.0));
+{    
+    FragPos = vec3(model * vec4(aPos, 1.0));
+    Normal = mat3(transpose(inverse(model))) * aNormal;
+    TexCoords = aTexCoords;
     //使用inverse和transpose函数自己生成这个法线矩阵
     //法线矩阵让法向量转换在世界空间坐标中
     //inverse函数：得到逆矩阵。      transpose函数：得到转置矩阵
-    Normal = mat3(transpose(inverse(view * model))) * aNormal;
-    TexCoords = aTexCoords;
+    gl_Position = projection * view * vec4(FragPos, 1.0);
 }

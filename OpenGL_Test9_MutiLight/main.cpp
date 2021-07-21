@@ -130,7 +130,7 @@ int main()
     
     // build and compile our shader program
     // ------------------------------------
-    char* headDir = "/Users/haoxiangliang/Desktop/代码草稿/OpenGL/OpenGL_Test8_MyLight/OpenGL_Test8_MyLight/";
+    char* headDir = "/Users/haoxiangliang/Desktop/代码草稿/OpenGL/OpenGL_Test9_MutiLight/OpenGL_Test9_MutiLight/";
     string p1 = string(headDir) + "LightShader/LightVertexShader.cpp";
     string p2 = string(headDir) + "LightShader/LightFragmentShader.cpp";
     Shader lightingShader(p1.c_str(), p2.c_str());
@@ -209,15 +209,24 @@ int main()
             }
             
             lightingShader.use();
+            lightingShader.setVec3("viewPos", camera.Position);
             //设置材质
             float shininess = 0.5f * 128.0f;
             lightingShader.setInt("material.diffuse", 0);
             lightingShader.setInt("material.specular", 1);
             lightingShader.setFloat("material.shininess", shininess);
             //设置光源
+            lightingShader.setInt("useType", 2);
+            //点光源
+            lightingShader.setVec3("lightPos", lightPos);
+            lightingShader.setFloat("light.constant",  1.0f);
+            lightingShader.setFloat("light.linear",    0.09f);
+            lightingShader.setFloat("light.quadratic", 0.032f);
+            //平行光
             lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+            
             lightingShader.setVec3("light.ambient", vec3(0.7f));
-            lightingShader.setVec3("light.diffuse", vec3(1.0f)); // 将光照调暗了一些以搭配场景
+            lightingShader.setVec3("light.diffuse", vec3(1.0f));
             lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
             
             lightingShader.setMat4("model", value_ptr(model));
