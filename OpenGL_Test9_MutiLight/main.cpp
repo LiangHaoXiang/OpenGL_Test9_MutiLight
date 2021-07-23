@@ -95,6 +95,13 @@ vec3 cubePositions[] = {
 //Camera camera = Camera();
 Camera camera(vec3(0.0f, 0.0f, 3.0f));
 
+//光源类型
+enum LightType {
+    LightType_Direction = 1,  //平行光
+    LightType_Point = 2,      //点光源
+    LightType_Spot = 3,       //聚光灯
+};
+
 int main()
 {
     // glfw: initialize and configure
@@ -216,14 +223,25 @@ int main()
             lightingShader.setInt("material.specular", 1);
             lightingShader.setFloat("material.shininess", shininess);
             //设置光源
-            lightingShader.setInt("useType", 2);
-            //点光源
-            lightingShader.setVec3("lightPos", lightPos);
-            lightingShader.setFloat("light.constant",  1.0f);
-            lightingShader.setFloat("light.linear",    0.09f);
-            lightingShader.setFloat("light.quadratic", 0.032f);
-            //平行光
-            lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+            int lightType = LightType_Spot;
+            lightingShader.setInt("lightType", lightType);
+            if (lightType == LightType_Direction) {
+                //平行光
+                lightingShader.setVec3("light.direction", -0.2f, -1.0f, -0.3f);
+            }
+            else if (lightType == LightType_Point) {
+                //点光源
+                lightingShader.setVec3("light.position", lightPos);
+                lightingShader.setFloat("light.constant",  1.0f);
+                lightingShader.setFloat("light.linear",    0.09f);
+                lightingShader.setFloat("light.quadratic", 0.032f);
+            }
+            else if (lightType == LightType_Spot) {
+                //聚光灯
+                lightingShader.setVec3("light.position", lightPos);
+                lightingShader.setVec3("light.direction", cubePositions[0] - lightPos);
+                lightingShader.setFloat("light.cutOff", cos(radians(12.5f)));
+            }
             
             lightingShader.setVec3("light.ambient", vec3(0.7f));
             lightingShader.setVec3("light.diffuse", vec3(1.0f));

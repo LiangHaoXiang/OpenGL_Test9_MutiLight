@@ -9,14 +9,17 @@ struct Material {
 
 //光源属性结构
 struct Light {
-    vec3 position;
-    vec3 direction;     //平行光照射方向
+    vec3 position;      //光源位置  （点光/聚光 变量）
+    vec3 direction;     //光照射方向 （平行光/聚光 变量）
     vec3 ambient;       //环境光
     vec3 diffuse;       //漫反射
     vec3 specular;      //镜面反射
-    float constant;
-    float linear;
-    float quadratic;
+    
+    float constant;     //点光源常数 c
+    float linear;       //点光源一次项常数 l
+    float quadratic;    //点光源二次项常数 q
+    
+    float cutOff;       //切光角的余弦值
 };
 
 in vec3 FragPos;        //片段的坐标位置
@@ -26,12 +29,12 @@ in vec2 TexCoords;
 uniform Material material;  //材质
 uniform Light light;        //光源
 uniform vec3 viewPos;
-uniform int useType;    //使用哪种光源
+uniform int lightType;    //使用哪种光源
 
 void main()
 {
     //平行光
-    if (useType == 1)
+    if (lightType == 1)
     {
         //环境光
         vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
@@ -52,7 +55,7 @@ void main()
         FragColor = vec4(result, 1.0);
     }
     //点光源
-    else if (useType == 2)
+    else if (lightType == 2)
     {
         //环境光
         vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
@@ -73,5 +76,39 @@ void main()
         //各种光的分量相加
         vec3 result = (ambient + diffuse + specular) * attenuation;
         FragColor = vec4(result, 1.0);
+    }
+    //聚光灯
+    else if (lightType == 3)
+    {
+        vec3 lightDir = normalize(light.position - FragPos);
+        float theta = dot(lightDir, normalize(-light.direction));
+        if (theta > light.cutOff)
+        {
+            // 执行光照计算
+            
+            //环境光
+            vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+            //漫反射光
+            vec3 norm = normalize(Normal);  //标准化法向量
+            vec3 lightDir = normalize(light.position - FragPos);
+            float diff = max(dot(norm, lightDir), 0.0); //向量点乘 得到cos余弦值
+            vec3 diffuse = light.diffuse * diff * vec3(texture(material.diffuse, TexCoords));
+            //镜面反射光
+            vec3 viewDir = normalize(viewPos - FragPos);    //观察方向
+            vec3 reflectDir = reflect(-lightDir, norm);     //反射光方向
+            float specularStrength = 0.5;   //镜面强度
+            float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);   //pow是次幂函数：x的y次方
+            vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
+            
+            //各种光的分量相加
+            vec3 result = ambient + diffuse + specular;
+            FragColor = vec4(result, 1.0);
+        }
+        else
+        {
+            // 否则，使用环境光，让场景在聚光之外时不至于完全黑暗
+            vec3 ambient = light.ambient * vec3(texture(material.diffuse, TexCoords));
+            FragColor = vec4(ambient, 1.0);
+        }
     }
 }
