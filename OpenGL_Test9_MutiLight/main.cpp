@@ -241,6 +241,7 @@ int main()
                 lightingShader.setVec3("light.position", lightPos);
                 lightingShader.setVec3("light.direction", cubePositions[0] - lightPos);
                 lightingShader.setFloat("light.cutOff", cos(radians(12.5f)));
+                lightingShader.setFloat("light.outerCutOff", cos(radians(17.5f)));
             }
             
             lightingShader.setVec3("light.ambient", vec3(0.7f));

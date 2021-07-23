@@ -19,7 +19,8 @@ struct Light {
     float linear;       //点光源一次项常数 l
     float quadratic;    //点光源二次项常数 q
     
-    float cutOff;       //切光角的余弦值
+    float cutOff;       //内圆锥切光角的余弦值
+    float outerCutOff;  //外圆锥切光角的余弦值
 };
 
 in vec3 FragPos;        //片段的坐标位置
@@ -100,8 +101,11 @@ void main()
             float spec = pow(max(dot(viewDir, reflectDir), 0.0), material.shininess);   //pow是次幂函数：x的y次方
             vec3 specular = light.specular * spec * vec3(texture(material.specular, TexCoords));
             
+            //平滑/软化边缘
+            float epsilon = light.cutOff - light.outerCutOff;
+            float intensity = clamp((theta - light.outerCutOff) / epsilon, 0.0, 1.0);   //聚光强度随内外圆锥余弦值差变化而变化
             //各种光的分量相加
-            vec3 result = ambient + diffuse + specular;
+            vec3 result = (ambient + diffuse + specular) * intensity;
             FragColor = vec4(result, 1.0);
         }
         else
