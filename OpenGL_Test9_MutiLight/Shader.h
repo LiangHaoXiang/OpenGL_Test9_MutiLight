@@ -102,8 +102,9 @@ public:
         glUniform3f(glGetUniformLocation(ID, name.c_str()), v3.x, v3.y, v3.z);
     }
     
-    void setMat4(const string &name, GLfloat *value) const
+    void setMat4(const string &name, mat4 m) const
     {
+        GLfloat *value = value_ptr(m);
         glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, value);
     }
 
